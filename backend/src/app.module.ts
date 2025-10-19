@@ -5,6 +5,7 @@ import { AppService } from './app.service';
 import { UsersModule } from './users/users.module';
 import { User } from './users/entities/user.entity';
 import { AuthModule } from './auth/auth.module';
+import { TokenBlocklist } from './auth/entities/token-blocklist.entity';
 
 @Module({
   imports: [
@@ -15,7 +16,7 @@ import { AuthModule } from './auth/auth.module';
       username: 'root',
       password: '',
       database: 'projeto_empregos',
-      entities: [User],
+      entities: [User, TokenBlocklist],
       synchronize: true,
     }),
     UsersModule,

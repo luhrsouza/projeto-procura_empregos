@@ -1,9 +1,10 @@
-import { Injectable, HttpException, HttpStatus, UnauthorizedException } from '@nestjs/common';
+import { Injectable, HttpException, HttpStatus, UnauthorizedException, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { User } from './entities/user.entity';
 import { CreateUserDto } from './dto/create-user.dto';
 import { LoginUserDto } from './dto/login-user.dto';
+import { UpdateUserDto } from './dto/update-user.dto';
 
 @Injectable()
 export class UsersService {
@@ -37,6 +38,37 @@ export class UsersService {
             return result;
         }
         return null;
+  }
+
+  async findOneById(id: number) {
+    const user = await this.usersRepository.findOne({ where: { id } });
+    if (!user) {
+      throw new NotFoundException({ message: 'User not found' });
     }
+    const { password, ...result } = user;
+    return result;
+  }
+
+  async update(id: number, updateUserDto: UpdateUserDto) {
+    const user = await this.usersRepository.findOne({ where: { id } });
+    if (!user) {
+      throw new NotFoundException({ message: 'User not found' });
+    }
+
+    this.usersRepository.merge(user, updateUserDto);
+    const updatedUser = await this.usersRepository.save(user);
+
+    const { password, ...result } = updatedUser;
+    return result;
+  }
+
+  async remove(id: number) {
+    const user = await this.usersRepository.findOne({ where: { id } });
+    if (!user) {
+      throw new NotFoundException({ message: 'User not found' });
+    }
+    await this.usersRepository.remove(user);
+    return { message: 'User deleted successfully' };
+  }
 
 }

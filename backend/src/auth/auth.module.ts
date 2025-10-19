@@ -5,6 +5,8 @@ import { AuthService } from './auth.service';
 import { JwtModule } from '@nestjs/jwt';
 import { PassportModule } from '@nestjs/passport';
 import { JwtStrategy } from './jwt.strategy';
+import { TypeOrmModule } from '@nestjs/typeorm';
+import { TokenBlocklist } from './entities/token-blocklist.entity';
 
 @Module({
   imports: [
@@ -14,6 +16,7 @@ import { JwtStrategy } from './jwt.strategy';
       secret: 'SEU_SEGREDO_SUPER_SECRETO',
       signOptions: { expiresIn: '1h' },
     }),
+    TypeOrmModule.forFeature([TokenBlocklist]),
   ],
   providers: [AuthService, JwtStrategy],
   controllers: [AuthController],

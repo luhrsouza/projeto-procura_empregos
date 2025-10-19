@@ -17,7 +17,11 @@ export class AuthController {
   @Post('logout')
   @HttpCode(HttpStatus.OK)
   async logout(@Request() req) {
-    console.log(`Usuário ${req.user.username} (ID: ${req.user.userId}) deslogado.`);
+    const authHeader = req.headers.authorization;
+    if (authHeader) {
+      const token = authHeader.split(' ')[1];
+      await this.authService.logout(token);
+    }
     return { message: 'Logout successful' };
   }
 }
