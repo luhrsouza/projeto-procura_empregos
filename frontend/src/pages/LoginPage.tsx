@@ -22,6 +22,9 @@ export default function LoginPage() {
         password,
       });
 
+      // --- LOG DO JSON RECEBIDO (SUCESSO) ---
+      console.log('<< [SERVIDOR -> CLIENTE] Resposta Recebida:', response.data);
+
       if (response.status === 200) {
         const { token } = response.data;
 

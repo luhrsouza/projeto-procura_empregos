@@ -55,6 +55,12 @@ export class UsersService {
       throw new NotFoundException({ message: 'User not found' });
     }
 
+    Object.keys(updateUserDto).forEach(key => {
+      if (updateUserDto[key] === '') {
+        updateUserDto[key] = null;
+      }
+    });
+
     this.usersRepository.merge(user, updateUserDto);
     const updatedUser = await this.usersRepository.save(user);
 

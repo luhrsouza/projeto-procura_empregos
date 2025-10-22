@@ -32,8 +32,13 @@ export default function RegisterPage() {
       ...(education && { education }),
     };
 
+    // --- LOG DO JSON ENVIADO ---
+    console.log('>> [CLIENTE -> SERVIDOR] Enviando JSON:', userData);
+
     try {
       const response = await axios.post(`${apiUrl}/users`, userData);
+      // --- LOG DO JSON RECEBIDO (SUCESSO) ---
+      console.log('<< [SERVIDOR -> CLIENTE] Resposta Recebida:', response.data);
 
       if (response.status === 201) {
         alert('Cadastro realizado com sucesso! Você será redirecionado para a página de login.');
