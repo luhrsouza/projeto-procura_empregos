@@ -6,6 +6,8 @@ import { UsersModule } from './users/users.module';
 import { User } from './users/entities/user.entity';
 import { AuthModule } from './auth/auth.module';
 import { TokenBlocklist } from './auth/entities/token-blocklist.entity';
+import { CompaniesModule } from './companies/companies.module';
+import { Company } from './companies/entities/company.entity';
 
 @Module({
   imports: [
@@ -16,11 +18,12 @@ import { TokenBlocklist } from './auth/entities/token-blocklist.entity';
       username: 'root',
       password: '',
       database: 'projeto_empregos',
-      entities: [User, TokenBlocklist],
+      entities: [User, TokenBlocklist, Company],
       synchronize: true,
     }),
     UsersModule,
     AuthModule,
+    CompaniesModule,
   ],
   controllers: [AppController],
   providers: [AppService],

@@ -3,6 +3,13 @@ import type { FormEvent } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import { useApi } from '../contexts/ApiContext';
+import { jwtDecode } from 'jwt-decode';
+
+interface TokenPayload {
+  sub: number;
+  username: string;
+  role: 'user' | 'company';
+}
 
 export default function LoginPage() {
   const { apiUrl } = useApi();
@@ -30,8 +37,21 @@ export default function LoginPage() {
 
         localStorage.setItem('authToken', token);
 
+        const decodedToken = jwtDecode<TokenPayload>(token);
+        const userRole = decodedToken.role;
+
+
         alert('Login realizado com sucesso!');
-        navigate('/home');
+
+        if (userRole === 'user') {
+          navigate('/profile');
+        } else if (userRole === 'company') {
+          navigate('/company/profile');
+        } else {
+          navigate('/home'); 
+        }
+        
+        window.location.reload();
       }
     } catch (err) {
       if (axios.isAxiosError(err) && err.response) {

@@ -1,17 +1,44 @@
 import { Routes, Route, Link, useNavigate } from 'react-router-dom';
+import { useState, useEffect } from 'react';
 import axios from 'axios';
+import { jwtDecode } from 'jwt-decode';
+import { useApi } from './contexts/ApiContext';
+
 import HomePage from './pages/HomePage';
 import LoginPage from './pages/LoginPage';
 import RegisterPage from './pages/RegisterPage';
 import SettingsPage from './pages/SettingsPage';
 import ProfilePage from './pages/ProfilePage';
+import CompanyRegisterPage from './pages/CompanyRegisterPage';
+import CompanyProfilePage from './pages/CompanyProfilePage';
+
 import ProtectedRoute from './components/ProtectedRoute';
-import { useApi } from './contexts/ApiContext';
+import CompanyProtectedRoute from './components/CompanyProtectedRoute';
+
+interface TokenPayload {
+  role: 'user' | 'company';
+}
 
 function App() {
   const navigate = useNavigate();
   const { apiUrl } = useApi();
   const token = localStorage.getItem('authToken');
+  
+  const [userRole, setUserRole] = useState<'user' | 'company' | null>(null);
+
+  useEffect(() => {
+    if (token) {
+      try {
+        const decodedToken = jwtDecode<TokenPayload>(token);
+        setUserRole(decodedToken.role);
+      } catch (e) {
+        localStorage.removeItem('authToken');
+        setUserRole(null);
+      }
+    } else {
+      setUserRole(null);
+    }
+  }, [token]);
 
   const handleLogout = async () => {
     try {
@@ -22,9 +49,9 @@ function App() {
       console.error("Erro no logout do servidor, mas deslogando no cliente.", error);
     } finally {
       localStorage.removeItem('authToken');
+      setUserRole(null);
       alert('Você foi deslogado com sucesso.');
       navigate('/login');
-      window.location.reload();
     }
   };
 
@@ -36,12 +63,18 @@ function App() {
         {!token ? (
           <>
             | <Link to="/login">Login</Link> |{' '}
-            <Link to="/register">Cadastro</Link>
+            <Link to="/register">Cadastro (Usuário)</Link> |{' '}
+            <Link to="/company/register">Cadastro (Empresa)</Link>
           </>
         ) : (
           <>
-            | <Link to="/profile">Perfil</Link> |{' '}
-            <button onClick={handleLogout} style={{background: 'none', border: 'none', padding: 0, color: 'blue', textDecoration: 'underline', cursor: 'pointer'}}>Logout</button>
+            {userRole === 'user' && (
+             <Link to="/profile">Meu Perfil</Link>
+            )}
+            {userRole === 'company' && (
+             <Link to="/company/profile">Painel da Empresa</Link>
+            )}
+            | <button onClick={handleLogout} style={{background: 'none', border: 'none', padding: 0, color: 'blue', textDecoration: 'underline', cursor: 'pointer'}}>Logout</button>
           </>
         )}
       </nav>
@@ -52,9 +85,14 @@ function App() {
           <Route path="/home" element={<HomePage />} />
           <Route path="/login" element={<LoginPage />} />
           <Route path="/register" element={<RegisterPage />} />
+          <Route path="/company/register" element={<CompanyRegisterPage />} />
 
           <Route element={<ProtectedRoute />}>
             <Route path="/profile" element={<ProfilePage />} />
+          </Route>
+
+          <Route element={<CompanyProtectedRoute />}>
+            <Route path="/company/profile" element={<CompanyProfilePage />} />
           </Route>
         </Routes>
       </main>

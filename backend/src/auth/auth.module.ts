@@ -7,10 +7,12 @@ import { PassportModule } from '@nestjs/passport';
 import { JwtStrategy } from './jwt.strategy';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { TokenBlocklist } from './entities/token-blocklist.entity';
+import { CompaniesModule } from 'src/companies/companies.module';
 
 @Module({
   imports: [
     UsersModule,
+    CompaniesModule,
     PassportModule.register({ defaultStrategy: 'jwt' }),
     JwtModule.register({
       secret: 'SEU_SEGREDO_SUPER_SECRETO',

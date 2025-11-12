@@ -5,6 +5,7 @@ import { LoginUserDto } from 'src/users/dto/login-user.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { TokenBlocklist } from './entities/token-blocklist.entity';
 import { Repository } from 'typeorm';
+import { CompaniesService } from 'src/companies/companies.service';
 
 @Injectable()
 export class AuthService {
@@ -13,17 +14,30 @@ export class AuthService {
     private jwtService: JwtService,
     @InjectRepository(TokenBlocklist)
     private tokenBlocklistRepository: Repository<TokenBlocklist>,
+    private companiesService: CompaniesService,
   ) {}
 
   async login(loginUserDto: LoginUserDto) {
     const { username, password } = loginUserDto;
-    const user = await this.usersService.validateUser(username, password);
 
-    if (!user) {
+    const user = await this.usersService.validateUser(username, password);
+    
+    let payload: any;
+
+    if (user) {
+      payload = { username: user.username, sub: user.id, role: 'user' };
+    } else {
+      const company = await this.companiesService.validateCompany(username, password);
+
+      if (company) {
+        payload = { username: company.username, sub: company.id, role: 'company' };
+      }
+    }
+
+    if (!payload) {
       throw new UnauthorizedException({ message: 'Invalid credentials' });
     }
 
-    const payload = { username: user.username, sub: user.id };
     const token = this.jwtService.sign(payload);
 
     return {
@@ -35,7 +49,7 @@ export class AuthService {
   async logout(token: string) {
     const isBlocked = await this.tokenBlocklistRepository.findOne({ where: { token } });
     if (isBlocked) {
-      return; // Token já está na lista, não faz nada
+      return;
     }
 
     const newBlockedToken = this.tokenBlocklistRepository.create({ token });

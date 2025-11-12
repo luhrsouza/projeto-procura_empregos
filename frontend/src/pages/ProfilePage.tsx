@@ -40,14 +40,24 @@ export default function ProfilePage() {
       }
 
       try {
-        const decodedToken: { sub: number } = jwtDecode(token);
-        const userId = decodedToken.sub;
+        const decodedToken = jwtDecode(token);
+      console.log('Token decodificado (Outro Servidor):', decodedToken);
 
-        const response = await axios.get(`${apiUrl}/users/${userId}`, {
-          headers: { Authorization: `Bearer ${token}` },
-        });
+      const payload = decodedToken as any;
+      const userId = payload.sub || payload.id || payload.userId || payload.user_id;
 
-        setUser(response.data);
+      console.log('ID extraído:', userId);
+
+      if (!userId) {
+        setError('Erro de compatibilidade: O token deste servidor não tem um campo de ID conhecido (sub, id, userId).');
+        return;
+      }
+
+      const response = await axios.get(`${apiUrl}/users/${userId}`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+
+      setUser(response.data);
 
         setFormData({
           name: response.data.name,
