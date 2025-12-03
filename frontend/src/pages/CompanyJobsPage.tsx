@@ -92,6 +92,13 @@ export default function CompanyJobsPage() {
                 <td>{job.city} - {job.state}</td>
                 <td>
                   <button 
+                    className="btn btn-sm btn-info me-2 text-white"
+                    style={{ marginRight: '10px', backgroundColor: '#17a2b8', border: 'none', padding: '5px 10px', cursor: 'pointer', color: 'white' }}
+                    onClick={() => navigate(`/company/jobs/${job.id}/candidates`)}
+                  >
+                   Ver Candidatos
+                  </button>
+                  <button 
                     onClick={() => navigate(`/company/jobs/edit/${job.id}`)}
                     style={{ marginRight: '10px', backgroundColor: '#ffc107', border: 'none', padding: '5px 10px', cursor: 'pointer' }}
                   >

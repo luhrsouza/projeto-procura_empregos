@@ -15,6 +15,7 @@ import CompanyJobsPage from './pages/CompanyJobsPage';
 import CompanyJobCreatePage from './pages/CompanyJobCreatePage';
 import CompanyJobEditPage from './pages/CompanyJobEditPage';
 import UserJobsSearchPage from './pages/UserJobsSearchPage';
+import CompanyJobCandidatesPage from './pages/CompanyJobCandidatesPage';
 
 import ProtectedRoute from './components/ProtectedRoute';
 import CompanyProtectedRoute from './components/CompanyProtectedRoute';
@@ -107,6 +108,7 @@ function App() {
             <Route path="/company/jobs" element={<CompanyJobsPage />} />
             <Route path="/company/jobs/create" element={<CompanyJobCreatePage />} />
             <Route path="/company/jobs/edit/:id" element={<CompanyJobEditPage />} />
+            <Route path="/company/jobs/:id/candidates" element={<CompanyJobCandidatesPage />} />
           </Route>
         </Routes>
       </main>
