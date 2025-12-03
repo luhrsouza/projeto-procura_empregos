@@ -7,6 +7,8 @@ import { Company } from '../companies/entities/company.entity';
 import { User } from '../users/entities/user.entity';
 import { UpdateJobDto } from './dto/update-job.dto';
 import { ApplyJobDto } from './dto/apply-job.dto';
+import { Feedback } from './entities/feedback.entity';
+import { CreateFeedbackDto } from './dto/create-feedback.dto';
 
 @Injectable()
 export class JobsService {
@@ -17,6 +19,8 @@ export class JobsService {
     private companiesRepository: Repository<Company>,
     @InjectRepository(User)
     private usersRepository: Repository<User>,
+    @InjectRepository(Feedback) 
+    private feedbackRepository: Repository<Feedback>,
   ) {}
 
   async create(createJobDto: CreateJobDto, companyId: number): Promise<Job> {
@@ -135,5 +139,31 @@ export class JobsService {
 
     job.candidates.push(user);
     await this.jobsRepository.save(job);
+  }
+
+  async sendFeedback(jobId: number, companyId: number, data: CreateFeedbackDto) {
+    const job = await this.jobsRepository.findOne({ 
+        where: { id: jobId },
+        relations: ['company', 'candidates'] 
+    });
+
+    if (!job) throw new NotFoundException({ message: 'Job not found' });
+
+    if (job.company.id !== companyId) {
+        throw new ForbiddenException({ message: 'Forbidden' });
+    }
+
+    const isCandidate = job.candidates.some(c => c.id === data.user_id);
+    if (!isCandidate) {
+        throw new NotFoundException({ message: 'Candidate not found in this job' });
+    }
+
+    const feedback = this.feedbackRepository.create({
+        message: data.message,
+        job: { id: jobId } as Job,
+        user: { id: data.user_id } as User
+    });
+
+    await this.feedbackRepository.save(feedback);
   }
 }

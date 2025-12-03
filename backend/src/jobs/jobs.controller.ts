@@ -4,6 +4,7 @@ import { CreateJobDto } from './dto/create-job.dto';
 import { AuthGuard } from '@nestjs/passport';
 import { UpdateJobDto } from './dto/update-job.dto';
 import { ApplyJobDto } from './dto/apply-job.dto';
+import { CreateFeedbackDto } from './dto/create-feedback.dto';
 
 @Controller('jobs')
 export class JobsController {
@@ -75,6 +76,21 @@ export class JobsController {
 
     return {
         message: 'Applied successfully'
+    };
+  }
+
+  @UseGuards(AuthGuard('jwt'))
+  @Post(':id/feedback')
+  @HttpCode(HttpStatus.OK)
+  async sendFeedback(@Request() req, @Param('id') id: string, @Body() createFeedbackDto: CreateFeedbackDto) {
+    if (req.user.role !== 'company') {
+        throw new ForbiddenException({ message: 'Forbidden' });
+    }
+
+    await this.jobsService.sendFeedback(+id, req.user.userId, createFeedbackDto);
+
+    return {
+        message: 'Feedback sent successfully'
     };
   }
 }
