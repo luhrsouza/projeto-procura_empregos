@@ -11,6 +11,9 @@ import SettingsPage from './pages/SettingsPage';
 import ProfilePage from './pages/ProfilePage';
 import CompanyRegisterPage from './pages/CompanyRegisterPage';
 import CompanyProfilePage from './pages/CompanyProfilePage';
+import CompanyJobsPage from './pages/CompanyJobsPage';
+import CompanyJobCreatePage from './pages/CompanyJobCreatePage';
+import CompanyJobEditPage from './pages/CompanyJobEditPage';
 
 import ProtectedRoute from './components/ProtectedRoute';
 import CompanyProtectedRoute from './components/CompanyProtectedRoute';
@@ -72,7 +75,10 @@ function App() {
              <Link to="/profile">Meu Perfil</Link>
             )}
             {userRole === 'company' && (
-             <Link to="/company/profile">Painel da Empresa</Link>
+             <>
+              <Link to="/company/profile">Painel da Empresa</Link> |{' '}
+              <Link to="/company/jobs">Gerenciar Vagas</Link>
+             </>
             )}
             | <button onClick={handleLogout} style={{background: 'none', border: 'none', padding: 0, color: 'blue', textDecoration: 'underline', cursor: 'pointer'}}>Logout</button>
           </>
@@ -93,6 +99,9 @@ function App() {
 
           <Route element={<CompanyProtectedRoute />}>
             <Route path="/company/profile" element={<CompanyProfilePage />} />
+            <Route path="/company/jobs" element={<CompanyJobsPage />} />
+            <Route path="/company/jobs/create" element={<CompanyJobCreatePage />} />
+            <Route path="/company/jobs/edit/:id" element={<CompanyJobEditPage />} />
           </Route>
         </Routes>
       </main>
