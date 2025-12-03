@@ -84,7 +84,7 @@ export class CompaniesController {
  }
 
  @UseGuards(AuthGuard('jwt'))
-  @Get(':company_id/jobs/:job_id')
+  @Post(':company_id/jobs/:job_id')
   async findCandidates(
     @Request() req,
     @Param('company_id') companyId: string,
