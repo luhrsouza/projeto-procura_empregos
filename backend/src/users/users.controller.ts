@@ -50,4 +50,14 @@ export class UsersController {
     }
     return this.usersService.remove(+userId);
   }
+
+  @UseGuards(AuthGuard('jwt'))
+  @Get(':user_id/jobs')
+  async findApplications(@Request() req, @Param('user_id') userId: string) {
+    if (req.user.role !== 'user' || req.user.userId !== +userId) {
+        throw new ForbiddenException({ message: 'Forbidden' });
+    }
+
+    return this.usersService.findApplications(+userId);
+  }
 }
