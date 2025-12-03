@@ -14,6 +14,7 @@ import CompanyProfilePage from './pages/CompanyProfilePage';
 import CompanyJobsPage from './pages/CompanyJobsPage';
 import CompanyJobCreatePage from './pages/CompanyJobCreatePage';
 import CompanyJobEditPage from './pages/CompanyJobEditPage';
+import UserJobsSearchPage from './pages/UserJobsSearchPage';
 
 import ProtectedRoute from './components/ProtectedRoute';
 import CompanyProtectedRoute from './components/CompanyProtectedRoute';
@@ -72,7 +73,10 @@ function App() {
         ) : (
           <>
             {userRole === 'user' && (
-             <Link to="/profile">Meu Perfil</Link>
+             <>
+              <Link to="/profile">Meu Perfil</Link> |{' '}
+              <Link to="/jobs">Buscar Vagas</Link>
+             </>
             )}
             {userRole === 'company' && (
              <>
@@ -95,6 +99,7 @@ function App() {
 
           <Route element={<ProtectedRoute />}>
             <Route path="/profile" element={<ProfilePage />} />
+            <Route path="/jobs" element={<UserJobsSearchPage />} />
           </Route>
 
           <Route element={<CompanyProtectedRoute />}>
