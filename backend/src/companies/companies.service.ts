@@ -1,15 +1,18 @@
-import { Injectable, HttpException, HttpStatus, NotFoundException } from '@nestjs/common';
+import { Injectable, HttpException, HttpStatus, NotFoundException, ForbiddenException} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Company } from './entities/company.entity';
 import { CreateCompanyDto } from './dto/create-company.dto';
 import { UpdateCompanyDto } from './dto/update-company.dto';
+import { Job } from '../jobs/entities/job.entity';
 
 @Injectable()
 export class CompaniesService {
   constructor(
     @InjectRepository(Company)
     private readonly companyRepository: Repository<Company>,
+    @InjectRepository(Job)
+    private readonly jobsRepository: Repository<Job>,
   ) {}
 
   async create(createCompanyDto: CreateCompanyDto): Promise<Company> {
@@ -94,5 +97,31 @@ export class CompaniesService {
 
   async markOnline(id: number, status: boolean) {
     await this.companyRepository.update(id, { isOnline: status });
+  }
+
+  async findJobCandidates(companyId: number, jobId: number) {
+    const job = await this.jobsRepository.findOne({
+      where: { id: jobId },
+      relations: ['company', 'candidates'],
+    });
+
+    if (!job) {
+      throw new NotFoundException({ message: 'Job not found' });
+    }
+
+    if (job.company.id !== companyId) {
+      throw new ForbiddenException({ message: 'Forbidden' });
+    }
+
+    return {
+      items: job.candidates.map(user => ({
+        user_id: user.id,
+        name: user.name,
+        email: user.email,
+        phone: user.phone,
+        education: user.education,
+        experience: user.experience
+      }))
+    };
   }
 }

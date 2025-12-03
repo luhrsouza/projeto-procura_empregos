@@ -82,4 +82,18 @@ export class CompaniesController {
       }
       return this.companiesService.remove(+companyId);
  }
+
+ @UseGuards(AuthGuard('jwt'))
+  @Get(':company_id/jobs/:job_id')
+  async findCandidates(
+    @Request() req,
+    @Param('company_id') companyId: string,
+    @Param('job_id') jobId: string
+  ) {
+    if (req.user.role !== 'company' || req.user.userId !== +companyId) {
+      throw new ForbiddenException({ message: 'Forbidden' });
+    }
+
+    return this.companiesService.findJobCandidates(+companyId, +jobId);
+  }
 }
