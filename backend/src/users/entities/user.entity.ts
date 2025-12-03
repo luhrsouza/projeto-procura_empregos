@@ -25,4 +25,7 @@ export class User {
 
   @Column({ nullable: true })
   education: string;
+
+  @Column({ type: 'datetime', nullable: true })
+  lastActive: Date;
 }

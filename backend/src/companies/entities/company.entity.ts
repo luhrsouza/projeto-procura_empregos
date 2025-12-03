@@ -1,4 +1,5 @@
-import { Entity, PrimaryGeneratedColumn, Column } from 'typeorm';
+import { Entity, PrimaryGeneratedColumn, Column, OneToMany } from 'typeorm';
+import { Job } from '../../jobs/entities/job.entity';
 
 @Entity()
 export class Company {
@@ -34,4 +35,10 @@ export class Company {
 
   @Column({ unique: true, length: 150 })
   email: string;
+
+  @OneToMany(() => Job, (job) => job.company)
+  jobs: Job[];
+
+  @Column({ type: 'datetime', nullable: true })
+  lastActive: Date;
 }

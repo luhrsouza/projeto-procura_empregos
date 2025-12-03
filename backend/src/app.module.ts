@@ -8,6 +8,10 @@ import { AuthModule } from './auth/auth.module';
 import { TokenBlocklist } from './auth/entities/token-blocklist.entity';
 import { CompaniesModule } from './companies/companies.module';
 import { Company } from './companies/entities/company.entity';
+import { JobsModule } from './jobs/jobs.module';
+import { Job } from './jobs/entities/job.entity';
+import { APP_INTERCEPTOR } from '@nestjs/core';
+import { ActivityInterceptor } from './common/interceptors/activity.interceptor';
 
 @Module({
   imports: [
@@ -18,14 +22,21 @@ import { Company } from './companies/entities/company.entity';
       username: 'root',
       password: '',
       database: 'projeto_empregos',
-      entities: [User, TokenBlocklist, Company],
+      entities: [User, TokenBlocklist, Company, Job],
       synchronize: true,
     }),
+    TypeOrmModule.forFeature([User, Company]),
     UsersModule,
     AuthModule,
     CompaniesModule,
+    JobsModule,
   ],
   controllers: [AppController],
-  providers: [AppService],
+  providers: [AppService,
+    {
+      provide: APP_INTERCEPTOR,
+      useClass: ActivityInterceptor,
+    },
+  ],
 })
 export class AppModule {}
