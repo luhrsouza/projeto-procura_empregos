@@ -41,4 +41,7 @@ export class Company {
 
   @Column({ type: 'datetime', nullable: true })
   lastActive: Date;
+
+  @Column({ default: false })
+  isOnline: boolean;
 }

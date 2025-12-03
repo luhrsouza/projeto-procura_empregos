@@ -14,14 +14,12 @@ export class AppController {
 
   @Get('server-status')
   async serverStatus() {
-    const tenMinutesAgo = new Date(Date.now() - 10 * 60 * 1000);
-
     const activeUsers = await this.usersRepo.find({
-      where: { lastActive: MoreThan(tenMinutesAgo) }
+      where: { isOnline: true }
     });
 
     const activeCompanies = await this.companiesRepo.find({
-      where: { lastActive: MoreThan(tenMinutesAgo) }
+      where: { isOnline: true }
     });
 
     let html = `
@@ -37,37 +35,35 @@ export class AppController {
                 .user { background-color: #007bff; }
                 .company { background-color: #28a745; }
             </style>
-            <meta http-equiv="refresh" content="5"> </head>
+            <meta http-equiv="refresh" content="5"> 
+        </head>
         <body>
-          <h1>Painel do Servidor - Usuários Online (Últimos 10min)</h1>
+          <h1>Painel do Servidor - Usuários Online (Via Login)</h1>
           
           <h2>Usuários Comuns (${activeUsers.length})</h2>
           <table>
-            <tr><th>ID</th><th>Nome</th><th>Última Atividade</th><th>Status</th></tr>
+            <tr><th>ID</th><th>Nome</th><th>Status</th></tr>
             ${activeUsers.map(u => `
               <tr>
                 <td>${u.id}</td>
                 <td>${u.name}</td>
-                <td>${u.lastActive ? u.lastActive.toLocaleString() : 'N/A'}</td>
                 <td><span class="badge user">Online</span></td>
               </tr>`).join('')}
           </table>
 
           <h2>Empresas (${activeCompanies.length})</h2>
           <table>
-            <tr><th>ID</th><th>Nome</th><th>Última Atividade</th><th>Status</th></tr>
+            <tr><th>ID</th><th>Nome</th><th>Status</th></tr>
             ${activeCompanies.map(c => `
               <tr>
                 <td>${c.id}</td>
                 <td>${c.name}</td>
-                <td>${c.lastActive ? c.lastActive.toLocaleString() : 'N/A'}</td>
                 <td><span class="badge company">Online</span></td>
               </tr>`).join('')}
           </table>
         </body>
       </html>
     `;
-
     return html;
   }
 }

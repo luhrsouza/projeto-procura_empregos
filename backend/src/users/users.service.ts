@@ -77,4 +77,8 @@ export class UsersService {
     return { message: 'User deleted successfully' };
   }
 
+  async markOnline(id: number, status: boolean) {
+    await this.usersRepository.update(id, { isOnline: status });
+  }
+
 }

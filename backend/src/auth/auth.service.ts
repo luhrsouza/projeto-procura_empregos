@@ -25,11 +25,13 @@ export class AuthService {
     let payload: any;
 
     if (user) {
+      await this.usersService.markOnline(user.id, true);
       payload = { username: user.username, sub: user.id, role: 'user' };
     } else {
       const company = await this.companiesService.validateCompany(username, password);
 
       if (company) {
+        await this.companiesService.markOnline(company.id, true);
         payload = { username: company.username, sub: company.id, role: 'company' };
       }
     }
@@ -46,13 +48,17 @@ export class AuthService {
     };
   }
 
-  async logout(token: string) {
+  async logout(token: string, userId: number, role: string) {
     const isBlocked = await this.tokenBlocklistRepository.findOne({ where: { token } });
-    if (isBlocked) {
-      return;
-    }
+    if (isBlocked) return;
 
     const newBlockedToken = this.tokenBlocklistRepository.create({ token });
     await this.tokenBlocklistRepository.save(newBlockedToken);
+
+    if (role === 'user') {
+        await this.usersService.markOnline(userId, false);
+    } else if (role === 'company') {
+        await this.companiesService.markOnline(userId, false);
+    }
   }
 }

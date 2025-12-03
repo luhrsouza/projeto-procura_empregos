@@ -91,4 +91,8 @@ export class CompaniesService {
 
     return { message: 'Company deleted successfully' };
   }
+
+  async markOnline(id: number, status: boolean) {
+    await this.companyRepository.update(id, { isOnline: status });
+  }
 }

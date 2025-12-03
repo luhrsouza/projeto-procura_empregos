@@ -20,7 +20,7 @@ export class AuthController {
     const authHeader = req.headers.authorization;
     if (authHeader) {
       const token = authHeader.split(' ')[1];
-      await this.authService.logout(token);
+      await this.authService.logout(token, req.user.userId, req.user.role);
     }
     return { message: 'Logout successful' };
   }
